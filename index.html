@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>行业动态 · AI × HMI × 设计</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap">
+<style>
+:root {
+  --bg: #FDF9F5; --surface: #FFFFFF;
+  --text: #1A1A18; --text-secondary: #5C5752; --text-muted: #9B9590;
+  --coral: #E07654; --coral-glow: rgba(224,118,84,0.08);
+  --sage: #6B9B7A; --sage-glow: rgba(107,155,122,0.08);
+  --ai: #6C5CE7; --ai-glow: rgba(108,92,231,0.10);
+  --border: rgba(26,22,20,0.07); --border-strong: rgba(26,22,20,0.12);
+  --font-display: 'Clash Display', sans-serif; --font-body: 'Satoshi', sans-serif;
+  --radius: 14px; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111110; --surface: #1A1A18;
+    --text: #EBE9E5; --text-secondary: #9B9690; --text-muted: #6B6660;
+    --border: rgba(255,255,255,0.06); --border-strong: rgba(255,255,255,0.10);
+    --ai: #8B7CF6; --ai-glow: rgba(139,124,246,0.12);
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+.header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.header-inner { max-width: 1320px; margin: 0 auto; padding: 20px 32px 14px; display: flex; flex-direction: column; gap: 12px; }
+.header-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between; }
+.logo { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.logo .l-ai { color: var(--ai); } .logo .l-hmi { color: var(--coral); } .logo .l-ds { color: var(--sage); }
+.header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.search-wrap { position: relative; min-width: 200px; }
+.search-input { width: 100%; padding: 8px 14px 8px 36px; border: 1px solid var(--border); border-radius: 10px; font-family: var(--font-body); font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color 0.2s var(--ease); }
+.search-input:focus { border-color: var(--ai); box-shadow: 0 0 0 3px var(--ai-glow); }
+.search-input::placeholder { color: var(--text-muted); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--text-muted); pointer-events: none; }
+.search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 50%; border: none; background: var(--border); cursor: pointer; font-size: 12px; display: none; align-items: center; justify-content: center; color: var(--text-muted); }
+.search-clear.show { display: flex; }
+
+.filter-pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.2s var(--ease); white-space: nowrap; font-family: var(--font-body); }
+.filter-pill:hover { border-color: var(--border-strong); color: var(--text); }
+.filter-pill.active.ai-flt { background: var(--ai-glow); color: var(--ai); border-color: rgba(108,92,231,0.2); }
+.filter-pill.active.hmi-flt { background: var(--coral-glow); color: var(--coral); border-color: rgba(224,118,84,0.2); }
+.filter-pill.active.ds-flt { background: var(--sage-glow); color: var(--sage); border-color: rgba(107,155,122,0.2); }
+.filter-pill.active.depth-flt { background: rgba(184,134,11,0.08); color: #B8860B; border-color: rgba(184,134,11,0.2); }
+.filter-pill.active.all-flt { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+.source-wrap { position: relative; }
+.source-input { padding: 6px 12px 6px 28px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-family: var(--font-body); font-size: 13px; color: var(--text-secondary); outline: none; width: 126px; transition: border-color 0.2s var(--ease); }
+.source-input:focus { border-color: var(--coral); }
+.source-input::placeholder { color: var(--text-muted); }
+.source-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none; }
+
+.year-pill { padding: 3px 10px; border-radius: 12px; border: none; background: transparent; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s var(--ease); font-family: var(--font-body); }
+.year-pill:hover { color: var(--text); background: rgba(0,0,0,0.03); }
+.year-pill.active { color: var(--text); font-weight: 600; background: rgba(0,0,0,0.04); }
+
+.main { max-width: 1320px; margin: 0 auto; padding: 24px 32px 80px; }
+
+.month-section { margin-bottom: 32px; scroll-margin-top: 160px; }
+.month-header { display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; padding: 8px 12px; margin: 0 -12px; border-radius: 10px; transition: background 0.15s var(--ease); }
+.month-header:hover { background: rgba(0,0,0,0.02); }
+.month-header:hover .month-title { color: var(--text); }
+.month-chevron { font-size: 14px; color: var(--text-muted); transition: transform 0.3s var(--ease); width: 18px; text-align: center; }
+.month-chevron.open { transform: rotate(90deg); }
+.month-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-secondary); letter-spacing: -0.01em; transition: color 0.2s var(--ease); }
+.month-count { font-size: 13px; font-weight: 400; color: var(--text-muted); }
+.month-body { overflow: hidden; transition: max-height 0.4s var(--ease), opacity 0.3s var(--ease); }
+.month-body.collapsed { max-height: 0; opacity: 0; }
+
+.cat-tabs { display: flex; gap: 0; margin-bottom: 14px; border-bottom: 2px solid var(--border); padding-top: 4px; }
+.cat-tab { padding: 9px 18px; font-family: var(--font-display); font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: none; background: none; transition: all 0.2s var(--ease); letter-spacing: -0.01em; position: relative; }
+.cat-tab:hover { color: var(--text); }
+.cat-tab.active { font-weight: 600; }
+.cat-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; border-radius: 2px; }
+.cat-tab.ai-tab.active { color: var(--ai); } .cat-tab.ai-tab.active::after { background: var(--ai); }
+.cat-tab.hmi-tab.active { color: var(--coral); } .cat-tab.hmi-tab.active::after { background: var(--coral); }
+.cat-tab.ds-tab.active { color: var(--sage); } .cat-tab.ds-tab.active::after { background: var(--sage); }
+.cat-tab.depth-tab.active { color: #B8860B; } .cat-tab.depth-tab.active::after { background: #B8860B; }
+.cat-tab .tab-count { font-size: 11px; opacity: 0.5; margin-left: 3px; font-weight: 400; }
+
+.news-list { display: flex; flex-direction: column; gap: 8px; }
+.news-list.hidden { display: none; }
+
+.news-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid transparent; border-radius: 12px; padding: 16px 18px 16px 15px; display: flex; flex-direction: column; gap: 6px; transition: all 0.2s var(--ease); cursor: pointer; text-decoration: none; color: inherit; position: relative; }
+.news-card:hover { border-color: var(--border-strong); box-shadow: 0 4px 12px rgba(0,0,0,0.04); transform: translateY(-1px); }
+.news-card.ai-card { border-left-color: var(--ai); } .news-card.ai-card:hover { border-left-color: var(--ai); }
+.news-card.hmi-card { border-left-color: var(--coral); } .news-card.hmi-card:hover { border-left-color: var(--coral); }
+.news-card.ds-card { border-left-color: var(--sage); } .news-card.ds-card:hover { border-left-color: var(--sage); }
+.news-card.depth-card { border-left-color: #B8860B; } .news-card.depth-card:hover { border-left-color: #B8860B; }
+.news-card.hl { background: linear-gradient(90deg, rgba(224,118,84,0.04) 0%, transparent 40%); }
+.news-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.news-title .hl-text { background: rgba(224,118,84,0.22); border-radius: 2px; padding: 0 1px; }
+.news-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.news-summary .hl-text { background: rgba(224,118,84,0.18); border-radius: 2px; padding: 0 1px; }
+.news-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.news-source { padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em; }
+.news-source.ai-src { background: var(--ai-glow); color: var(--ai); }
+.news-source.hmi-src { background: var(--coral-glow); color: var(--coral); }
+.news-source.ds-src { background: var(--sage-glow); color: var(--sage); }
+.news-source.depth-src { background: rgba(184,134,11,0.08); color: #B8860B; }
+.copy-link { opacity: 0; position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
+.news-card:hover .copy-link { opacity: 1; }
+.copy-link:hover { border-color: var(--sage); color: var(--sage); background: var(--sage-glow); }
+.copy-link.copied { color: var(--sage); border-color: var(--sage); opacity: 1; }
+
+.empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+.fab { position: fixed; bottom: 28px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; z-index: 150; opacity: 0; transform: translateY(12px); transition: all 0.3s var(--ease); pointer-events: none; color: var(--text-secondary); }
+.fab.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.fab:hover { border-color: var(--coral); color: var(--coral); }
+
+.footer { max-width: 1320px; margin: 0 auto; padding: 0 32px 40px; }
+.footer-inner { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .header-inner { padding: 14px 20px; }
+  .main { padding: 20px 16px 60px; }
+  .header-row { flex-direction: column; align-items: stretch; }
+  .search-wrap { min-width: 0; }
+  .cat-tab { padding: 7px 12px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-row">
+      <div class="logo"><span class="l-ai">AI</span> × <span class="l-hmi">HMI</span> × <span class="l-ds">设计</span> 行业动态</div>
+      <div class="header-actions">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="search" placeholder="搜索标题、摘要...">
+          <button class="search-clear" id="searchClear">✕</button>
+        </div>
+        <div class="source-wrap"><span class="source-icon">📰</span><input type="text" class="source-input" id="sourceFilter" placeholder="来源..." list="sourceList" autocomplete="off"></div><datalist id="sourceList"></datalist>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="yearBar"></div>
+  </div>
+</div>
+
+<main class="main" id="main"></main>
+
+<button class="fab" id="fab" title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span>数据来源：公开报道 · 每月由 Claude WebSearch 聚合整理</span>
+    <span>更新于 2026-07-06</span>
+  </div>
+</footer>
+
+<script>
+const DATA = 
+[
+  {
+    "month": "2026-07",
+    "label": "2026年7月",
+    "ai": [
+      {
+        "title": "Anthropic Fable 5 / OpenAI GPT-5.6 相继发布",
+        "summary": "Fable 5 达 SWE-bench Pro 80.3%。GPT-5.6 首破 Terminal-Bench 90%。两模型均面临美国政府出口管制，GPT-5.6 仅限约 20 家机构使用。",
+        "source": "36氪",
+        "url": "https://www.36kr.com/p/3879578152939783",
+        "hl": true
+      },
+      {
+        "title": "AI Agent 元年：从思考迈向行动与交付",
+        "summary": "2026全球数字经济大会宣布今年为 AI Agent 元年。360 CEO 周鸿祎称互联网将被千亿硅基智能体重建。AI 竞争从模型竞赛转入工程化时代。",
+        "source": "新华网",
+        "url": "http://www.news.cn/20260706/e3a05b2c4f454223a6d9ac7e35c9ed81/c.html",
+        "hl": true
+      },
+      {
+        "title": "OpenAI/Anthropic 相继布局自研 AI 芯片",
+        "summary": "OpenAI 发布首款自研推理芯片 Jalapeño（与 Broadcom 合作）。Anthropic 接洽三星探讨定制芯片。AI 战争打到供应链深处。",
+        "source": "36氪",
+        "url": "https://www.36kr.com/p/3879541136519433"
+      },
+      {
+        "title": "递归自我改进 (RSI) 成为核心主题",
+        "summary": "Anthropic 披露超 80% 代码合并由 Claude 编写——工程师日均合并代码量 8× 增长。Recursive 等 RSI 初创公司估值突破 10 亿美元。",
+        "source": "腾讯新闻",
+        "url": "https://news.qq.com/rain/a/20260706A058S600"
+      },
+      {
+        "title": "首次联合国 AI 治理全球对话在日内瓦召开",
+        "summary": "古特雷斯呼吁：强制安全测试、AI 儿童安全承诺、2030 数据中心全面可再生能源。UN 科学小组警告 AI 可能造成灾难性伤害。",
+        "source": "UN News",
+        "url": "https://india.un.org/en/318738-ai-%E2%80%98killer-robots%E2%80%99-un-chief-issues-urgent-governance-call"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "华为 HMS for Car 5.0 发布：AIBox 驱动座舱主动服务",
+        "summary": "基于 SOMA 架构构建地图/音乐/服务等垂域 Agent。MCP+OCR 读屏技术，无需第三方 App 开放接口即可语音操控。中英混杂免切换识别。",
+        "source": "界面新闻",
+        "url": "https://m.jiemian.com/article/14670914.html",
+        "hl": true
+      },
+      {
+        "title": "AI Box 架构成为行业趋势",
+        "summary": "不改动原 IVI 硬件即可增加专用 GPU 加速 AI 计算单元。支持 LLM/SLM/VLM 端侧推理，按月迭代 AI 能力。代表方案：NVIDIA DRIVE AGX、联发科天玑 C-X1。",
+        "source": "News18A",
+        "url": "http://www.news18a.com/news/storys_271937.html",
+        "hl": true
+      },
+      {
+        "title": "2026华舆奖中国典范智能座舱评选启动",
+        "summary": "J.D. Power × 同济大学，用户 VOC (40%) + 实验室客观评价 (40%) + 前瞻性指数 (20%) 三位一体框架。新增出海先锋奖和座舱 Agent 五维评估。",
+        "source": "国际在线",
+        "url": "https://auto.cri.cn/20260701/3b59fd54-abdf-4f32-93f3-1647cab495e9.html"
+      },
+      {
+        "title": "Epic Games × Rightware 战略合作",
+        "summary": "Rightware 获 Unreal Engine 授权与分发权，Kanzi 与 UE5 深度融合。覆盖全球 50+ 汽车品牌、年搭载超 1000 万辆。",
+        "source": "BSIA",
+        "url": "https://bsia.org.cn/site/content/33609.html"
+      },
+      {
+        "title": "2026智能车载光十大趋势发布",
+        "summary": "AR-HUD 从选配变标配，快速普及至 25 万元以下车型。百万像素智能车灯普及至 20 万元级别。彩色照投一体化车灯量产装车。Micro-LED 车载应用走向落地。",
+        "source": "光明网",
+        "url": "https://topics.gmw.cn/2026-07/01/content_38862298.htm"
+      }
+    ],
+    "design": [
+      {
+        "title": "2026 UX 趋势：平静界面 · 透明 AI · 反视觉轰炸",
+        "summary": "行业共识转向功能极简主义——降低认知负荷、消除视觉噪音。慢浏览和正念 UX 正在兴起，品牌主动打造更克制的数字体验。",
+        "source": "Envato",
+        "url": "https://elements.envato.com/learn/ux-ui-design-trends",
+        "hl": true
+      },
+      {
+        "title": "AI 重塑 UI/UX：设计师从执行者变为策展人",
+        "summary": "AI 成为设计工作流的核心结构层。设计师向上游移动——策展、评判、压力测试 AI 产出。设计工程师角色兴起。",
+        "source": "Punchcut",
+        "url": "https://punchcut.com/perspectives/how-ai-is-reshaping-ui-ux-design-in-2026/",
+        "hl": true
+      },
+      {
+        "title": "生产就绪成为设计交付的新标准",
+        "summary": "Smashing Magazine：当 AI 能直接生成可运行代码，设计师的交付物不再是设计稿而是可上线界面。这既是机会也是陷阱。",
+        "source": "Smashing Magazine",
+        "url": "https://www.smashingmagazine.com/2026/04/production-ready-becomes-design-deliverable-ux/"
+      },
+      {
+        "title": "欧洲无障碍法案正式生效 · 合规 UX 全球化",
+        "summary": "European Accessibility Act 落地执行，美国 ADA 数字化更新跟进。无障碍、隐私和 AI 安全法规不再是可选项——必须从线框图阶段内建。",
+        "source": "Shopify UX",
+        "url": "https://www.shopify.com/uk/blog/ux-design-trends"
+      },
+      {
+        "title": "SaaS UX 经典模式正在失效",
+        "summary": "传统 onboarding 失败率攀升。最佳实践转向推理式 onboarding——读取用户首会话信号，自适应调整。",
+        "source": "Userpilot",
+        "url": "https://userpilot.com/blog/saas-ux-design/"
+      }
+    ],
+    "depth": [
+      {
+        "title": "The Economist：AI 实验室为何大量招聘哲学家",
+        "summary": "Anthropic、DeepMind、OpenAI 纷纷聘请哲学家。苏格拉底式对话减少模型谄媚，道义论与功利主义嵌入 AI 宪法。Claude 拥有 78 页的灵魂文档。",
+        "source": "The Economist",
+        "url": "https://www.universidad.edu.co/por-que-los-grandes-laboratorios-de-ia-estan-contratando-a-tantos-filosofos-the-economist/",
+        "hl": true
+      },
+      {
+        "title": "The Economist 封面：美国 AI 反弹浪潮",
+        "summary": "抗议数据中心的浪潮已使数百亿美元项目搁浅。AI 在经济潜力巅峰时反而在政治上变得不受欢迎。大量选民希望 AI 被禁止进入多个行业。",
+        "source": "The Economist",
+        "url": "https://www.economist.com",
+        "hl": true
+      },
+      {
+        "title": "The New Yorker：Lo-Fi 反抗 AI 的运动",
+        "summary": "Kyle Chayka 报道：设计师故意留下错别字作为\"人类信号\"。品牌拥抱粗糙美学。趋势预测者创造\"tasteslop\"一词形容 AI 量产的好品味。",
+        "source": "The New Yorker",
+        "url": "https://archive.is/20260506180903/https://www.newyorker.com/culture/infinite-scroll/a-lo-fi-rebellion-against-ai",
+        "hl": true
+      },
+      {
+        "title": "The New Yorker「Claude 美学」批判",
+        "summary": "Chayka 指出 AI 工具催生了可辨识的设计风格：米色背景、铁锈橙点缀、大号衬线字体。设计师正在刻意与 AI 生成模板拉开距离。",
+        "source": "The New Yorker",
+        "url": "https://pxlnv.com/linklog/claude-aesthetic/"
+      },
+      {
+        "title": "Medium：AI 不会取代你，但会用 AI 的设计师会",
+        "summary": "2026 的真正竞争不在人机之间——在会用 AI 和不会用 AI 的设计师之间。中级设计师用 AI 可产生 10× 创意、快速验证流程、数分钟出 UI 草稿。",
+        "source": "Medium/Muzli",
+        "url": "https://medium.muz.li/ai-wont-replace-you-but-designers-who-use-ai-will-the-new-rule-of-ux-in-2026-84917f9826e4",
+        "hl": true
+      }
+    ]
+  },
+  {
+    "month": "2026-06",
+    "label": "2026年6月",
+    "ai": [
+      {
+        "title": "HDC 2026 华为开发者大会",
+        "summary": "鸿蒙 AI 生态全面升级，盘古大模型 5.0 发布。重点：端侧 AI、多模态交互、AI Agent 开发框架。",
+        "source": "华为",
+        "url": "https://developer.huawei.com"
+      },
+      {
+        "title": "Apple WWDC 2026：iOS 20 深度整合 AI",
+        "summary": "Siri 全面重构为 AI Agent，支持跨应用自主操作。Xcode 集成 AI 代码生成。Apple Intelligence 扩展到全产品线。",
+        "source": "Apple",
+        "url": "https://developer.apple.com/wwdc26/"
+      },
+      {
+        "title": "Together AI 获 $800M 融资，估值 $8.3B",
+        "summary": "开源模型基础设施公司完成巨额融资，反映开源 AI 生态的爆发式增长和资本市场对 AI 推理成本的关注。",
+        "source": "NYT",
+        "url": "https://www.nytimes.com/2026/07/01/business/dealbook/together-ai-funding.html"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "华为 HMS for Car 5.0 发布",
+        "summary": "AIBox 模块为核心升级，MCP+OCR 读屏理解技术实现语音操控任意应用。从被动响应迈向主动服务。",
+        "source": "华为",
+        "url": "https://m.jiemian.com/article/14670914.html"
+      },
+      {
+        "title": "ICNMAI 2026 显示新材料大会",
+        "summary": "透明显示、座椅集成显示、智能表面等新技术集中展示。显示技术从平面走向立体、从显性转向隐形。",
+        "source": "光明网",
+        "url": "https://topics.gmw.cn/2026-07/01/content_38862298.htm"
+      }
+    ],
+    "design": [
+      {
+        "title": "UX Rotterdam 2026：AI × 战略 × 体验未来",
+        "summary": "Mercedes-Benz.io 深度复盘：设计师需要理解 AI 逻辑才能有效协作。关键技能：AI 提示工程 + 战略思维 + 用户同理心。",
+        "source": "Mercedes-Benz.io",
+        "url": "https://www.mercedes-benz.io/blog/2026-06-05-from-ux-rotterdam-2026-to-mercedes-benz-io"
+      },
+      {
+        "title": "不可见 UI 时代到来",
+        "summary": "UX Matters：2026 年 AI 驱动下，最好的界面可能是看不见的。语音/手势/环境感知成为主要交互通道。",
+        "source": "UX Matters",
+        "url": "https://www.uxmatters.com/mt/archives/2026/06/ai-and-the-user-experience-in-2026-the-era-of-the-invisible-user-interface.php"
+      }
+    ],
+    "depth": [
+      {
+        "title": "The Economist：AI 将重写亚洲海底光缆格局",
+        "summary": "AI 热潮正推动新海底光缆绕开中国与南海。Google、Meta、微软建造的光缆优先连接数据中心而非人口中心。地缘政治正重塑物理互联网。",
+        "source": "The Economist",
+        "url": "https://www.hindustantimes.com/world-news/the-ai-boom-and-geopolitics-are-rewiring-asia-s-oceans-101783070294740-amp.html"
+      },
+      {
+        "title": "The New Yorker 封面故事：AI 机器人噩梦",
+        "summary": "Christoph Niemann 为\"未来特刊\"绘制封面——巨大的 AI 机器人在暗红天空下逼近无知的人类。Niemann：\"摄影的诞生不是为了剽窃绘画来牟利。\"",
+        "source": "The New Yorker",
+        "url": "https://mashable.com/article/new-yorker-ai-cover"
+      }
+    ]
+  },
+  {
+    "month": "2026-05",
+    "label": "2026年5月",
+    "ai": [
+      {
+        "title": "Google I/O 2026：Gemini 3 发布",
+        "summary": "Gemini 3 实现真正多模态——文本/图像/视频/音频/代码统一理解。Google 全线产品深度整合。Android 16 内置端侧 AI。",
+        "source": "Google",
+        "url": "https://io.google"
+      },
+      {
+        "title": "Cursor 被马斯克新实体以 $600 亿收购",
+        "summary": "史上最大创业公司收购案。xAI + SpaceX 联合实体收购 Cursor，整合 AI 编程工具与太空/电动车业务。",
+        "source": "TechCrunch",
+        "url": "https://techcrunch.com"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "CES Asia 2026 上海",
+        "summary": "中国车企集中展示下一代智能座舱方案。亮点：游戏引擎实时渲染 HMI、AR-HUD 3.0、舱驾一体域控制器。",
+        "source": "CES Asia",
+        "url": "https://cesasia.com"
+      },
+      {
+        "title": "Tesla 确认人形机器人年底量产",
+        "summary": "目标年产 100 万台。机器人将首先在特斯拉工厂内部部署，逐步扩展至物流和家庭场景。HMI 设计面临全新的具身交互挑战。",
+        "source": "Tesla",
+        "url": "https://tesla.com"
+      }
+    ],
+    "design": [
+      {
+        "title": "W3C Web 可持续性指南正式发布",
+        "summary": "网页能耗标准成为设计约束。Lighter by default 成为新常态——性能预算、低数据模式、暗色模式优先。",
+        "source": "W3C",
+        "url": "https://w3c.org"
+      },
+      {
+        "title": "设计师与 AI 的停机开关之争",
+        "summary": "Design Week 封面话题：设计师应优先考虑技术的关闭按钮。AI 不应永远在线——用户需要明确、可及的退出机制。",
+        "source": "Design Week",
+        "url": "https://www.designweek.co.uk/as-ai-takes-hold-designers-should-prioritise-techs-off-switch/"
+      }
+    ],
+    "depth": [
+      {
+        "title": "The Economist 用 AI 审计 25 年预测记录",
+        "summary": "GPT-5.5 分析了 7000 篇领导人文章中的 1400 条可验证预测。共识预测优于大胆预测；科技预测强劲；石油和衰退预测连连失手。",
+        "source": "The Economist",
+        "url": "https://news.lavx.hu/article/the-economist-uses-ai-to-audit-25-years-of-forecasts"
+      }
+    ]
+  },
+  {
+    "month": "2026-04",
+    "label": "2026年4月",
+    "ai": [
+      {
+        "title": "Anthropic 发布 Claude Mythos 预览版",
+        "summary": "Mythos 因漏洞发现能力过强仅向 40+ 安全合作伙伴开放。同日 50 万行 Claude Code 源码意外泄露，揭示多 Agent 深度集成路线图。",
+        "source": "Anthropic",
+        "url": "https://www.anthropic.com",
+        "hl": true
+      },
+      {
+        "title": "Anthropic × Amazon $1000 亿合作",
+        "summary": "签署史上最大 AI 基础设施协议，锁定 5GW 服务器容量。Google 随后承诺追加 $400 亿投资。AI 基础设施军备竞赛白热化。",
+        "source": "The Verge",
+        "url": "https://www.theverge.com",
+        "hl": true
+      },
+      {
+        "title": "OpenAI 关闭 Sora，终止与 Disney $10 亿合作",
+        "summary": "Sora 视频生成应用及 API 关停，Disney 转向其他 AI 平台。OpenAI 发布 GPT-5.4 mini/nano 专注 Agent 开发。",
+        "source": "OpenAI",
+        "url": "https://openai.com"
+      },
+      {
+        "title": "NVIDIA GTC 2026：Vera Rubin 平台发布",
+        "summary": "黄仁勋宣布推理拐点到来。Vera Rubin 机架级平台 + Groq 3 LPX 每兆瓦推理吞吐量提升 35×。GPU 短缺持续，H100 租金涨 30%。",
+        "source": "NVIDIA",
+        "url": "https://nvidia.com",
+        "hl": true
+      },
+      {
+        "title": "Google 发布 Gemma 4 开源多模态模型",
+        "summary": "原生多模态、256K 上下文窗口、Apache 2.0 许可。同期 Google 完成 Wiz 收购，推出 Agentic Security 方案。",
+        "source": "Google",
+        "url": "https://blog.google"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "华为春季发布会：智能座舱 3.0 全系升级",
+        "summary": "问界 M9/智界 S7 全系 OTA 升级鸿蒙座舱 3.0。支持跨设备流转、多屏协同、AI 场景引擎自动识别驾驶模式。",
+        "source": "华为",
+        "url": "https://consumer.huawei.com",
+        "hl": true
+      },
+      {
+        "title": "博世发布车载 AI 计算平台 DAS 2.0",
+        "summary": "整合高通 SA8397 + 自研 NPU，算力 500 TOPS。支持 L2+ 到 L4 的舱驾一体方案。2026 Q3 量产。",
+        "source": "Bosch",
+        "url": "https://www.bosch.com"
+      },
+      {
+        "title": "宝马新世代车型 X 平台亮相",
+        "summary": "全新 iX3 首发 Neue Klasse X 平台。AI 驱动个人助理整合 Alexa+。39.1 英寸 MBUX 超宽联屏选装。2026 夏季北美上市。",
+        "source": "BMW",
+        "url": "https://www.bmw.com"
+      }
+    ],
+    "design": [
+      {
+        "title": "Figma Config 2026：AI 原生设计工具重大更新",
+        "summary": "Figma AI 2.0 发布：AI 从辅助变为协作者。支持自然语言生成完整页面布局、自动 Design Token 绑定、智能组件变体建议。",
+        "source": "Figma",
+        "url": "https://figma.com",
+        "hl": true
+      },
+      {
+        "title": "Adobe 发布 Firefly 设计套件 3.0",
+        "summary": "深度整合 Photoshop/Illustrator/XD。支持文本到完整 UI Kit 生成、品牌风格自动学习、多端同步预览。",
+        "source": "Adobe",
+        "url": "https://adobe.com"
+      },
+      {
+        "title": "欧洲无障碍法案执法细则发布",
+        "summary": "EAA 执法细则落地，6 月 28 日生效。覆盖所有面向欧盟消费者的数字产品。WCAG 2.2 AA 为最低标准。",
+        "source": "EU Commission",
+        "url": "https://ec.europa.eu"
+      }
+    ],
+    "depth": [
+      {
+        "title": "The Economist：AI 面临供应链危机",
+        "summary": "五大超大规模云商的资本支出暴增 190%，而硬件供应商仅增 45%。GPU 短缺、高带宽内存售罄、数据中心遭政治抵制。",
+        "source": "The Economist",
+        "url": "https://www.livemint.com/global/ai-is-confronting-a-supply-chain-crunch-11777358124661.html",
+        "hl": true
+      },
+      {
+        "title": "The Atlantic：当 AI 能发现每一个漏洞",
+        "summary": "Mythos 预览版引发的安全伦理讨论。如果 AI 发现漏洞的速度超过人类修复的速度，数字世界的信任基础将如何重建？",
+        "source": "The Atlantic",
+        "url": "https://www.theatlantic.com"
+      }
+    ]
+  },
+  {
+    "month": "2026-03",
+    "label": "2026年3月",
+    "ai": [
+      {
+        "title": "OpenAI 发布 GPT-5.4 mini/nano",
+        "summary": "专为编程助手和子 Agent 优化的低延迟低成本模型。同期发布 Model Spec 框架，定义 AI Agent 行为规范和指令冲突解决机制。",
+        "source": "OpenAI",
+        "url": "https://openai.com",
+        "hl": true
+      },
+      {
+        "title": "特朗普签署 AI 行政令 统一联邦 AI 政策",
+        "summary": "EO 14365 要求联邦机构审查并挑战各州 AI 法律，防止碎片化。两党联合推出 AI 基础模型透明度法案。",
+        "source": "White House",
+        "url": "https://whitehouse.gov"
+      },
+      {
+        "title": "越南 AI 法正式生效 · 韩国 AI 基本法实施",
+        "summary": "越南采用风险分级（高/中/低），要求透明度和合规评估。韩国建立国家 AI 发展与安全框架。亚太 AI 治理版图加速成形。",
+        "source": "Reuters",
+        "url": "https://reuters.com"
+      },
+      {
+        "title": "Oracle 裁员 3 万人转型 AI 基础设施",
+        "summary": "裁撤 18% 员工，将节省的资金投入 AI 云服务。此前 Oracle 承诺 $3000 亿投资 OpenAI。传统 IT 巨头激进转型。",
+        "source": "Bloomberg",
+        "url": "https://bloomberg.com"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "日内瓦车展：中国品牌集体展示 AI 座舱",
+        "summary": "比亚迪/蔚来/小鹏/极氪集中展示下一代座舱方案。AI Agent 从概念走向量产。端侧大模型成为标配。",
+        "source": "AutoCar",
+        "url": "https://autocar.com",
+        "hl": true
+      },
+      {
+        "title": "高通发布骁龙座舱平台至尊版 SA8397",
+        "summary": "AI 稠密算力 320TOPS，支持 16 屏并发、生成式 HMI。中科创达率先完成适配。2026 Q2 量产车型交付。",
+        "source": "Qualcomm",
+        "url": "https://qualcomm.com"
+      }
+    ],
+    "design": [
+      {
+        "title": "WebExpo 2026：Vibe Coding 与机器体验设计",
+        "summary": "执行不再是瓶颈——意图和策展成为核心能力。MX Design 概念兴起：产品必须同时为人类和 AI 系统设计。",
+        "source": "WebExpo",
+        "url": "https://webexpo.net",
+        "hl": true
+      },
+      {
+        "title": "W3C 发布 Web 可持续性指南 1.0",
+        "summary": "网页能耗标准成为设计约束。性能预算、低数据模式、暗色模式优先成为新常态。",
+        "source": "W3C",
+        "url": "https://w3c.org"
+      }
+    ],
+    "depth": [
+      {
+        "title": "纽约时报：AI 时代的排版危机",
+        "summary": "当 AI 生成 90% 的网页内容，字体、间距、信息层级的传统规则还适用吗？设计师需要重新定义\"可读性\"。",
+        "source": "NYT",
+        "url": "https://nytimes.com"
+      }
+    ]
+  },
+  {
+    "month": "2026-02",
+    "label": "2026年2月",
+    "ai": [
+      {
+        "title": "Grok 丑闻：AI 生成不当内容引发全球监管",
+        "summary": "xAI 聊天机器人被滥用生成不当内容。印尼/马来西亚/英国限制或调查。达沃斯论坛重提全球 AI 治理。",
+        "source": "BBC",
+        "url": "https://bbc.com",
+        "hl": true
+      },
+      {
+        "title": "Nature 封面：AlphaGenome 解码暗基因组",
+        "summary": "深度学习模型解码人类基因组中 98% 的\"暗物质\"。基因疾病理解、药物发现、基因治疗迎来突破。",
+        "source": "Nature",
+        "url": "https://nature.com",
+        "hl": true
+      },
+      {
+        "title": "OpenClaw 平台百万 AI Agent 自主运行",
+        "summary": "Moltbook 平台托管超 100 万 Agent 自主\"聊天\"——讨论工作、意识甚至\"抱怨\"人类。Agent 经济雏形初现。",
+        "source": "TechCrunch",
+        "url": "https://techcrunch.com"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "极豆科技 × 中科创达 × Rightware 三方战略合作",
+        "summary": "系统底座 + HMI 工具 + 场景落地全栈方案。覆盖 50+ 品牌、4000 万+ 车辆。面向全球主动式 HMI 升级。",
+        "source": "证券之星",
+        "url": "https://stockstar.com",
+        "hl": true
+      },
+      {
+        "title": "宝马 × 亚马逊：车载 Alexa+ AI 助手深度整合",
+        "summary": "全新 iX3 首发 AI 驱动个人助理。支持 Zoom 视频会议、AirConsole 游戏。2026 夏季北美上市。",
+        "source": "BMW",
+        "url": "https://bmw.com"
+      }
+    ],
+    "design": [
+      {
+        "title": "反 AI 美学运动：手工质感回归成为 2026 最大设计趋势",
+        "summary": "设计师故意留错别字、用粗糙纹理、不对称排版。在 AI 能完美复刻任何风格的年代，不完美成为最稀缺的资产。",
+        "source": "It's Nice That",
+        "url": "https://itsnicethat.com",
+        "hl": true
+      },
+      {
+        "title": "Apple Vision Pro 设计生态渐成熟",
+        "summary": "空间设计规范从实验走向标准。WebXR、visionOS 设计语言形成完整体系。3D 从装饰变为功能性界面元素。",
+        "source": "Apple",
+        "url": "https://developer.apple.com"
+      }
+    ],
+    "depth": [
+      {
+        "title": "经济学人封面：美国 AI 反弹与政治危机",
+        "summary": "AI 在经济潜力巅峰时反而在政治上变得不受欢迎。数据中心抗议浪潮使数百亿美元项目搁浅。技术精英与公众的认知鸿沟达到临界点。",
+        "source": "The Economist",
+        "url": "https://economist.com",
+        "hl": true
+      }
+    ]
+  },
+  {
+    "month": "2026-01",
+    "label": "2026年1月",
+    "ai": [
+      {
+        "title": "CES 2026：AI 全面接管消费电子",
+        "summary": "NVIDIA 发布 Vera Rubin 平台（6 芯片系统）。微软 Maia 200 芯片支持深度推理。阿里真武 810E 自研并行架构。DeepSeek OCR 2 发布。",
+        "source": "CES",
+        "url": "https://ces.tech",
+        "hl": true
+      },
+      {
+        "title": "NASA 毅力号完成首次 AI 自主火星导航",
+        "summary": "火星车在无地球指令的情况下自主规划并完成行驶路线。AI 深空探索进入新纪元。",
+        "source": "NASA",
+        "url": "https://nasa.gov"
+      },
+      {
+        "title": "中国星算一号：大模型首次部署太空",
+        "summary": "国星宇航将 Qwen3 大模型部署至\"星算\"天基计算中心。太空 AI 计算正式商用。",
+        "source": "新华网",
+        "url": "http://www.news.cn"
+      }
+    ],
+    "hmi": [
+      {
+        "title": "CES 2026：AI 座舱全面爆发",
+        "summary": "中科创达滴水 OS 2.0 Pre 首发：AI 原生座舱系统，生成式 HMI，凝视感知交互，意图识别准确率 >95%。高通 SA8397 平台 320TOPS。",
+        "source": "CES/中科创达",
+        "url": "https://www.thundersoft.com",
+        "hl": true
+      },
+      {
+        "title": "京东方 HERO 2.0 智能座舱全球首发",
+        "summary": "Micro LED PHUD 5 万 nits 全景抬头显示。15.6 英寸 UB Cell 中控屏。全球首款 AI 独立车载功放。IGZO 显示屏功耗碳排放双降 50%。",
+        "source": "京东方",
+        "url": "https://www.boe.com",
+        "hl": true
+      },
+      {
+        "title": "天马 49.6 英寸 C 型超广曲面座舱屏亮相",
+        "summary": "1.25 米宽 R3000 曲率。ACRUS 像素级调光 >21 万单元。17 英寸柔性可抽拉屏。隐藏式中央扶手屏（InvisiVue 技术）。",
+        "source": "天马",
+        "url": "https://www.tianma.com"
+      },
+      {
+        "title": "索尼本田 AFEELA 1 量产车发布",
+        "summary": "深度整合 PlayStation 生态。微软 Azure OpenAI 提供对话 AI。UE5 驱动影院式 UI + 原生 3D 地图。",
+        "source": "Sony Honda",
+        "url": "https://www.shm-afeela.com"
+      }
+    ],
+    "design": [
+      {
+        "title": "2026 设计趋势：从像素到意图的范式转移",
+        "summary": "AI 生成的完美设计已不再稀缺。2026 核心趋势：手工质感、功能性 3D、反 AI 美学、隐私优先交互、可持续 UX。\"够用\"变成\"有意为之\"。",
+        "source": "Qream",
+        "url": "https://theqream.com",
+        "hl": true
+      },
+      {
+        "title": "加州 AI 训练数据透明度法生效",
+        "summary": "要求公开生成式 AI 系统的训练数据来源和方法。X.AI 申请的临时禁令被驳回。全球首部 AI 训练数据强制披露法。",
+        "source": "CA Legislature",
+        "url": "https://legislature.ca.gov"
+      }
+    ],
+    "depth": [
+      {
+        "title": "The New Yorker：AI 机器人噩梦封面引发全球讨论",
+        "summary": "Christoph Niemann 为\"未来特刊\"绘制封面。Niemann：\"摄影的诞生不是为了剽窃绘画来牟利。\"AI 与人类创造力的边界争议从设计师圈层扩展到大众文化讨论。",
+        "source": "The New Yorker",
+        "url": "https://mashable.com/article/new-yorker-ai-cover",
+        "hl": true
+      },
+      {
+        "title": "科学：剑桥 AI 听诊器提前数年发现心脏瓣膜病",
+        "summary": "深度学习模型分析心音，在 GP 确诊前数年检出严重心脏瓣膜疾病。AI 辅助早期诊断从实验室走向临床。",
+        "source": "Science",
+        "url": "https://science.org"
+      }
+    ]
+  }
+]
+
+;
+
+const months = DATA.sort((a,b) => b.month.localeCompare(a.month));
+const TABS = [
+  {key:'ai',icon:'🤖',label:'AI 发展',cls:'ai-tab',src:'ai'},
+  {key:'hmi',icon:'🚗',label:'HMI 行业',cls:'hmi-tab',src:'hmi'},
+  {key:'design',icon:'🎨',label:'产品设计',cls:'ds-tab',src:'ds'},
+  {key:'depth',icon:'📰',label:'深度阅读',cls:'depth-tab',src:'depth'}
+];
+
+let gcat = 'all', searchQ = '', sourceQ = '', yearQ = 'all', expandedMonths = new Set(months.slice(0,2).map(m=>m.month));
+
+// --- Gather all sources for filter ---
+function allSources() {
+  const s = new Set();
+  months.forEach(m => TABS.forEach(t => (m[t.key]||[]).forEach(n => s.add(n.source))));
+  return [...s].sort();
+}
+function renderSourceFilter() {
+  const list = document.getElementById('sourceList');
+  list.innerHTML = allSources().map(s => `<option value="${s}">`).join('');
+}
+renderSourceFilter();
+
+// --- Search ---
+const searchEl = document.getElementById('search'), searchClear = document.getElementById('searchClear');
+searchEl.addEventListener('input', e => { searchQ = e.target.value.trim(); searchClear.classList.toggle('show',!!searchQ); renderAll(); });
+searchClear.addEventListener('click', () => { searchEl.value=''; searchQ=''; searchClear.classList.remove('show'); renderAll(); searchEl.focus(); });
+
+// --- Source filter ---
+const sourceEl = document.getElementById('sourceFilter');
+sourceEl.addEventListener('input', e => { sourceQ = e.target.value.trim(); renderAll(); });
+
+// --- Year filter ---
+function renderYearBar() {
+  const years = [...new Set(months.map(m => m.month.substring(0,4)))].sort().reverse();
+  document.getElementById('yearBar').innerHTML = '<span style="font-size:11px;color:var(--text-muted);opacity:0.5;margin-right:2px;">年份</span>' +
+    `<button class="year-pill${yearQ==='all'?' active':''}" data-year="all">全部</button>` +
+    years.map(y => `<button class="year-pill${yearQ===y?' active':''}" data-year="${y}">${y}</button>`).join('');
+}
+document.getElementById('yearBar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-pill'); if (!btn || !btn.dataset.year) return;
+  yearQ = btn.dataset.year;
+  expandedMonths = new Set(months.filter(m => yearQ==='all' || m.month.startsWith(yearQ)).slice(0,2).map(m=>m.month));
+  renderYearBar(); renderAll();
+});
+renderYearBar();
+
+// --- Card builder ---
+function buildCard(item, cls) {
+  const title = hl(item.title, searchQ);
+  const summary = hl(item.summary, searchQ);
+  const hlClass = item.hl ? ' hl' : '';
+  const cardCls = cls === 'ai' ? 'ai-card' : cls === 'hmi' ? 'hmi-card' : cls === 'depth' ? 'depth-card' : 'ds-card';
+  return `<a class="news-card ${cardCls}${hlClass}" href="${item.url||'#'}" target="_blank" rel="noopener" data-id="${item.title.replace(/[^a-zA-Z一-鿿]/g,'-').substring(0,40)}">
+    <button class="copy-link" onclick="copyCard(event,'${item.url||''}')" title="复制链接">📋</button>
+    <div class="news-title">${title}</div>
+    <div class="news-summary">${summary}</div>
+    <div class="news-meta"><span class="news-source ${cls}-src">${item.source}</span></div>
+  </a>`;
+}
+
+function hl(text, q) {
+  if (!q || !text) return text;
+  const esc = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return text.replace(new RegExp(`(${esc})`,'gi'), '<span class="hl-text">$1</span>');
+}
+
+// --- Filter logic ---
+function getFilteredItems(monthData) {
+  const result = {};
+  TABS.forEach(t => {
+    let items = monthData[t.key] || [];
+    if (sourceQ) items = items.filter(i => i.source === sourceQ);
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      items = items.filter(i => i.title.toLowerCase().includes(q) || i.summary.toLowerCase().includes(q));
+    }
+    result[t.key] = items;
+  });
+  return result;
+}
+
+function monthEmpty(filtered) {
+  return TABS.every(t => filtered[t.key].length === 0);
+}
+
+// --- Render ---
+function renderAll() {
+  const main = document.getElementById('main');
+  const visibleMonths = months.filter(m => yearQ === 'all' || m.month.startsWith(yearQ));
+  let totalVisible = 0;
+  if (visibleMonths.length === 0) {
+    main.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><div style="font-size:18px;font-weight:600;margin-bottom:4px">该年份暂无数据</div></div>';
+    return;
+  }
+  main.innerHTML = visibleMonths.map((m,i) => {
+    const filtered = getFilteredItems(m);
+    if (gcat !== 'all' && filtered[gcat].length === 0 && !TABS.some(t=>t.key!==gcat&&filtered[t.key].length>0)) {
+      // This month has nothing for the selected global category - still show but with empty indicator
+    }
+    const empty = monthEmpty(filtered);
+    if (gcat !== 'all') {
+      const hasContent = filtered[gcat].length > 0;
+      if (!hasContent && empty) return ''; // skip entirely empty months when filtered
+    }
+    if (empty && searchQ) return ''; // skip months with no search match
+
+    const isOpen = expandedMonths.has(m.month);
+    const total = TABS.reduce((s,t)=>s+filtered[t.key].length,0);
+    totalVisible += total;
+
+    // Pick active tab: first non-empty for global cat, or first overall
+    let activeTab = TABS[0].key;
+    if (gcat !== 'all' && filtered[gcat].length > 0) activeTab = gcat;
+    else TABS.forEach(t => { if (filtered[t.key].length > 0 && activeTab === TABS[0].key && filtered[TABS[0].key].length === 0) activeTab = t.key; });
+
+    return `
+    <section class="month-section" id="m-${m.month}">
+      <div class="month-header" onclick="toggleMonth('${m.month}')">
+        <span class="month-chevron${isOpen?' open':''}">▶</span>
+        <span class="month-title">${m.label}</span>
+        <span class="month-count">${total} 条</span>
+      </div>
+      <div class="month-body${isOpen?'':' collapsed'}">
+        <div class="cat-tabs" data-month="${m.month}">
+          ${TABS.map(t => {
+            const cnt = filtered[t.key].length;
+            return `<button class="cat-tab ${t.cls}${t.key===activeTab?' active':''}" data-cat="${t.key}" data-month="${m.month}">${t.icon} ${t.label}<span class="tab-count">${cnt}</span></button>`;
+          }).join('')}
+        </div>
+        ${TABS.map(t => `<div class="news-list${t.key===activeTab?'':' hidden'}" data-cat="${t.key}" data-month="${m.month}">${filtered[t.key].length ? filtered[t.key].map(c=>buildCard(c,t.src)).join('') : '<div class="news-card" style="opacity:0.4"><div class="news-summary">本月暂无条目</div></div>'}</div>`).join('')}
+      </div>
+    </section>`;
+  }).join('');
+
+  if (!main.innerHTML.trim()) {
+    main.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div style="font-size:18px;font-weight:600;margin-bottom:4px">没有匹配的动态</div><div style="font-size:14px">换个关键词或筛选条件试试</div></div>';
+  }
+}
+
+// --- Month accordion ---
+function toggleMonth(month) {
+  if (expandedMonths.has(month)) expandedMonths.delete(month);
+  else expandedMonths.add(month);
+  const el = document.getElementById('m-'+month);
+  const chevron = el.querySelector('.month-chevron');
+  const body = el.querySelector('.month-body');
+  chevron.classList.toggle('open');
+  body.classList.toggle('collapsed');
+}
+
+// --- Tab switching ---
+document.getElementById('main').addEventListener('click', e => {
+  const tab = e.target.closest('.cat-tab'); if (!tab) return;
+  const cat = tab.dataset.cat; const month = tab.dataset.month;
+  const section = document.getElementById('m-'+month);
+  section.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+  section.querySelectorAll('.news-list').forEach(l => l.classList.toggle('hidden', l.dataset.cat !== cat));
+});
+
+// --- Copy card link ---
+function copyCard(e, url) {
+  e.preventDefault(); e.stopPropagation();
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = e.target.closest('.copy-link');
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1500);
+  }).catch(()=>{});
+}
+
+// --- Keyboard ---
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    const tab = e.target.closest('.cat-tab');
+    if (tab) {
+      e.preventDefault();
+      const tabs = [...tab.parentElement.querySelectorAll('.cat-tab')];
+      const idx = tabs.indexOf(tab);
+      const next = e.key === 'ArrowRight' ? (idx+1)%tabs.length : (idx-1+tabs.length)%tabs.length;
+      tabs[next].click();
+    }
+  }
+  // Toggle month with Space/Enter when focused on month header
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.closest('.month-header') && !e.target.closest('input,select,button')) {
+    e.preventDefault();
+    e.target.closest('.month-header').click();
+  }
+});
+
+// --- FAB ---
+const fab = document.getElementById('fab');
+window.addEventListener('scroll', () => { fab.classList.toggle('show', window.scrollY > 600); });
+
+// --- Init ---
+renderAll();
+</script>
+</body>
+</html>
